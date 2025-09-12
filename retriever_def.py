@@ -12,11 +12,16 @@ instruction = "Represent this sentence for searching relevant passages: "
 def load_and_prepare_data(file_path):
     """
     Load dataset and split into train/test.
-    Returns: train_df, test_df
+    First 80% -> train_df
+    Last 20%  -> test_df
     """
     df = pd.read_csv(file_path)  # must have columns: title, summarized_description, story_point
-    df["text"] = df["title"].fillna('') + " " + df["summarized_description"].fillna('')
-    train_df, test_df = train_test_split(df, test_size=0.2, random_state=42)
+    df["text"] = "Task title: " + df["title"].fillna('') + "\nTask Description:\n" + df["summarized_description"].fillna('')
+
+    split_index = int(len(df) * 0.8)  # 80% index
+    train_df = df.iloc[:split_index].reset_index(drop=True)
+    test_df = df.iloc[split_index:].reset_index(drop=True)
+
     return train_df, test_df
 
 
@@ -44,9 +49,3 @@ def retrieve_similar_tasks(index, train_df, test_task, top_k=3):
     scores, indices = index.search(query_embedding, top_k)
     results = train_df.iloc[indices[0]]
     return results, scores[0]
-
-
-
-
-
-
