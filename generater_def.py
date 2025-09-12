@@ -8,6 +8,7 @@ pipe = pipeline(
     "text-generation",
     model=model_id,
     torch_dtype=torch.bfloat16,
+    # device = 0
     device_map="auto",
 )
 
@@ -20,8 +21,13 @@ def generate(similar_tasks, test_task):
         for task in similar_tasks
     ])
 
-    prompt = f'''You are an expert Agile story point estimator. I will give you a new task along with 3 similar tasks and their story points.
-    Your job is to estimate the story point for the new task based on these references.'''
+    # prompt = f'''You are an expert Agile story point estimator. I will give you a new task along with 3 similar tasks and their story points.
+    # Your job is to estimate the story point for the new task based on these references.'''
+
+    prompt = f'''You are an expert Agile story point estimator.
+    I will give you a new task for which you have to estimate the story point. Story points are used to estimate the overall effort required to complete a task. They are chosen from a predefined scale, often using the Fibonacci sequence - 0, 1, 2, 3, 5, 8 and so on. Story points do not have fractional values.
+    For each new task, I will provide 3 similar tasks which already have story points recorded. While you try to estimate the story point for the new task, you can use these as reference because these tasks are from the same project. 
+    Your job is to estimate the story point after considering the complexity of the new task. You can use the provided similar tasks for further reference.'''
 
     user_content = f'''
     New Task:
